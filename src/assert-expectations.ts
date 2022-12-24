@@ -54,7 +54,6 @@ function createNewExpectation(
     const topKeyExpectationsObject = isTypeOfWithArray(currentExpectationsFile[topKey], 'object')
         ? (currentExpectationsFile[topKey] as JsonObject)
         : {};
-    console.log('child', currentExpectationsFile[topKey], topKeyExpectationsObject);
 
     const newExpectation = {
         [topKey]: {
@@ -72,6 +71,7 @@ export async function assertExpectation<ResultGeneric extends JsonValue = JsonVa
     expectationFile,
     cwd,
     noOverwriteWhenDifferent,
+    showFullError,
 }: Readonly<CompareExpectationsOptions<ResultGeneric>>): Promise<void> {
     const workingDir = cwd || process.cwd();
     const expectationsFilePath = expectationFile || join(workingDir, defaultExpectationFile);
@@ -129,7 +129,13 @@ export async function assertExpectation<ResultGeneric extends JsonValue = JsonVa
     }
 
     if (assertionError) {
-        throw assertionError;
+        if (showFullError) {
+            throw assertionError;
+        } else {
+            throw new Error(
+                `Expectation for key '${extractedKeys.topKey}' => '${extractedKeys.subKey}' failed.`,
+            );
+        }
     }
 }
 
