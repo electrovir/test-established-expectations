@@ -1,5 +1,5 @@
 import {itCases, typedAssertNotNullish} from '@augment-vir/chai';
-import {isTypeOfWithArray, wrapNarrowTypeWithTypeCheck} from '@augment-vir/common';
+import {isRuntimeTypeOf, wrapNarrowTypeWithTypeCheck} from '@augment-vir/common';
 import {randomString, readJson} from '@augment-vir/node-js';
 import chai, {assert} from 'chai';
 import chaiAsPromised from 'chai-as-promised';
@@ -120,7 +120,7 @@ describe(assertExpectation.name, () => {
 
         typedAssertNotNullish(afterTestJson);
 
-        if (!isTypeOfWithArray(afterTestJson, 'object')) {
+        if (!isRuntimeTypeOf(afterTestJson, 'object')) {
             assert.isObject(afterTestJson);
             assert.isNotArray(afterTestJson);
             throw new Error('afterTestJson was not an object');
@@ -159,6 +159,20 @@ describe(assertExpectation.name, () => {
                 expectationFile: expectationFiles.fullExpectationFile,
             },
             throws: undefined,
+        },
+        {
+            it: 'should pass when using another sub key',
+            input: {
+                key: {
+                    topKey: 'this is the top key',
+                    subKey: 'this is another sub key',
+                },
+                result: 'not the actual result',
+                noOverwriteWhenDifferent: true,
+                showFullError: true,
+                expectationFile: expectationFiles.fullExpectationFile,
+            },
+            throws: /to deeply equal/,
         },
         {
             it: 'should fail when output is wrong',

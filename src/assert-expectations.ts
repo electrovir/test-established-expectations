@@ -1,4 +1,4 @@
-import {isTypeOfWithArray, Overwrite} from '@augment-vir/common';
+import {isRuntimeTypeOf, Overwrite} from '@augment-vir/common';
 import {appendJson, readJson} from '@augment-vir/node-js';
 import {assert} from 'chai';
 import {existsSync} from 'fs';
@@ -33,7 +33,7 @@ function accessExpectationAtKey(
         subKey: keys.subKey,
     };
 
-    if (!isTypeOfWithArray(outerValue, 'object')) {
+    if (!isRuntimeTypeOf(outerValue, 'object')) {
         return {
             value: undefined,
             extractedKeys,
@@ -51,7 +51,7 @@ function createNewExpectation(
     keys: Readonly<ExpectationKeys>,
 ): JsonObject {
     const topKey = pickTopKeyFromExpectationKeys(keys);
-    const topKeyExpectationsObject = isTypeOfWithArray(currentExpectationsFile[topKey], 'object')
+    const topKeyExpectationsObject = isRuntimeTypeOf(currentExpectationsFile[topKey], 'object')
         ? (currentExpectationsFile[topKey] as JsonObject)
         : {};
 
@@ -82,7 +82,7 @@ export async function assertExpectation<ResultGeneric extends JsonValue = JsonVa
     }
 
     const loadedExpectations = await readJson(expectationsFilePath);
-    if (!isTypeOfWithArray(loadedExpectations, 'object')) {
+    if (!isRuntimeTypeOf(loadedExpectations, 'object')) {
         throw new Error(
             `Expectations file "${expectationsFilePath}" did not contain an object. It should contain an object.`,
         );
