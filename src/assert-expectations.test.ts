@@ -19,7 +19,7 @@ async function testThatOutputGotWritten({
     filePath: string;
     shouldFail: boolean;
 }) {
-    const options: CompareExpectationsOptions = {
+    const options: CompareExpectationsOptions<string> = {
         key: {
             topKey: randomString(),
             subKey: randomString(),
@@ -44,7 +44,7 @@ async function testThatMissingFileGotWritten(filePath: string) {
     assert.isTrue(existsSync(filePath), `'${filePath}' should exist after the assertion`);
 }
 
-const simpleOptions: CompareExpectationsOptions = {
+const simpleOptions: CompareExpectationsOptions<string> = {
     key: {
         topKey: 'topKey',
         subKey: 'subKey',
@@ -98,7 +98,7 @@ describe(assertExpectation.name, () => {
     it('should not modify other subKeys when they exist already', async () => {
         const beforeTestFileContents = await readFile(expectationFiles.fullExpectationFile);
 
-        const options = wrapNarrowTypeWithTypeCheck<CompareExpectationsOptions>()({
+        const options = wrapNarrowTypeWithTypeCheck<CompareExpectationsOptions<string>>()({
             key: {
                 topKey: 'this is the top key',
                 subKey: 'this is an invalid sub key',
@@ -144,6 +144,20 @@ describe(assertExpectation.name, () => {
                     subKey: 'this is the sub key',
                 },
                 result: 'fifty-two',
+                expectationFile: expectationFiles.fullExpectationFile,
+            },
+            throws: undefined,
+        },
+        {
+            it: 'should pass when a Date object is used',
+            input: {
+                key: {
+                    topKey: 'this is the top key',
+                    subKey: 'this is a date key',
+                },
+                result: {
+                    thisHasDate: new Date(1000),
+                },
                 expectationFile: expectationFiles.fullExpectationFile,
             },
             throws: undefined,

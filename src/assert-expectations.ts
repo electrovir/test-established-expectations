@@ -47,7 +47,7 @@ function accessExpectationAtKey(
 
 function createNewExpectation(
     currentExpectationsFile: Readonly<JsonObject>,
-    newResult: Readonly<JsonValue>,
+    newResult: any,
     keys: Readonly<ExpectationKeys>,
 ): JsonObject {
     const topKey = pickTopKeyFromExpectationKeys(keys);
@@ -65,7 +65,7 @@ function createNewExpectation(
     return newExpectation as JsonObject;
 }
 
-export async function assertExpectation<ResultGeneric extends JsonValue = JsonValue>({
+export async function assertExpectation<ResultGeneric>({
     key,
     result,
     expectationFile,
@@ -94,8 +94,12 @@ export async function assertExpectation<ResultGeneric extends JsonValue = JsonVa
     );
 
     let assertionError: unknown = undefined;
+
+    // put the result through the parser so that it matches the stringified result already saved
+    const jsonParsedResult = JSON.parse(JSON.stringify(result));
+
     try {
-        assert.deepStrictEqual<any>(result, expectedExpectation);
+        assert.deepStrictEqual<any>(jsonParsedResult, expectedExpectation);
     } catch (error) {
         assertionError = error;
     }
@@ -109,7 +113,7 @@ export async function assertExpectation<ResultGeneric extends JsonValue = JsonVa
     ) {
         await appendJson(
             expectationsFilePath,
-            createNewExpectation(loadedExpectations, result, key),
+            createNewExpectation(loadedExpectations, jsonParsedResult, key),
         );
     }
     const writingItNowMessage = noOverwriteWhenDifferent
@@ -139,7 +143,7 @@ export async function assertExpectation<ResultGeneric extends JsonValue = JsonVa
     }
 }
 
-export async function assertExpectedOutput<ResultGeneric extends JsonValue = JsonValue>(
+export async function assertExpectedOutput<ResultGeneric>(
     functionToExecute: () => Promisable<ResultGeneric>,
     options: Readonly<
         Omit<

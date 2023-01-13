@@ -1,6 +1,6 @@
 {
     "name": "test-established-expectations",
-    "version": "0.0.1",
+    "version": "0.0.2",
     "description": "For testing established expectations in a json file.",
     "keywords": [
         "test",

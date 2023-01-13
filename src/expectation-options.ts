@@ -1,9 +1,8 @@
-import type {JsonValue} from 'type-fest';
 import type {ExpectationKeys} from './expectation-key';
 
-export type CompareExpectationsOptions<ResultGeneric extends JsonValue = JsonValue> = {
+export type CompareExpectationsOptions<ResultGeneric> = {
     key: Readonly<ExpectationKeys>;
-    result: Readonly<ResultGeneric>;
+    result: ResultGeneric;
     expectationFile?: string;
     cwd?: string;
     /**

@@ -17,11 +17,11 @@ describe('CompareExpectationsOptions', () => {
             cwd: '',
             expectationFile: '',
             noOverwriteWhenDifferent: false,
-        }).toBeAssignableTo<CompareExpectationsOptions>();
+        }).toBeAssignableTo<CompareExpectationsOptions<number>>();
     });
 
     it('has proper optional props', () => {
-        assertTypeOf(baseExampleInstance).toBeAssignableTo<CompareExpectationsOptions>();
+        assertTypeOf(baseExampleInstance).toBeAssignableTo<CompareExpectationsOptions<number>>();
     });
 
     it('restricts the result type', () => {
