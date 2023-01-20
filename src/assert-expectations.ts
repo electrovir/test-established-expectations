@@ -71,7 +71,7 @@ export async function assertExpectation<ResultGeneric>({
     expectationFile,
     cwd,
     noOverwriteWhenDifferent,
-    showFullError,
+    showFullError = !!process.env.CI,
 }: Readonly<CompareExpectationsOptions<ResultGeneric>>): Promise<void> {
     const workingDir = cwd || process.cwd();
     const expectationsFilePath = expectationFile || join(workingDir, defaultExpectationFile);
@@ -134,7 +134,7 @@ export async function assertExpectation<ResultGeneric>({
     }
 
     if (assertionError) {
-        if (showFullError || process.env.CI) {
+        if (showFullError) {
             throw assertionError;
         } else {
             throw new Error(

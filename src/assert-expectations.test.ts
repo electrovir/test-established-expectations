@@ -202,6 +202,34 @@ describe(assertExpectation.name, () => {
             throws: Error,
         },
         {
+            it: 'should fail with showFullError off',
+            input: {
+                key: {
+                    topKey: 'this is the top key',
+                    subKey: 'this is the sub key',
+                },
+                result: 'fifty-three',
+                expectationFile: expectationFiles.fullExpectationFile,
+                noOverwriteWhenDifferent: true,
+                showFullError: false,
+            },
+            throws: Error,
+        },
+        {
+            it: 'should fail with showFullError on',
+            input: {
+                key: {
+                    topKey: 'this is the top key',
+                    subKey: 'this is the sub key',
+                },
+                result: 'fifty-three',
+                expectationFile: expectationFiles.fullExpectationFile,
+                noOverwriteWhenDifferent: true,
+                showFullError: true,
+            },
+            throws: Error,
+        },
+        {
             it: 'should fail when an empty topKey is given',
             input: {
                 ...simpleOptions,
