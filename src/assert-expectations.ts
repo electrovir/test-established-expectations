@@ -114,6 +114,7 @@ export async function assertExpectation<ResultGeneric>({
         await appendJson(
             expectationsFilePath,
             createNewExpectation(loadedExpectations, jsonParsedResult, key),
+            {includeTrailingNewLine: true},
         );
     }
     const writingItNowMessage = noOverwriteWhenDifferent

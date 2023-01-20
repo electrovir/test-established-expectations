@@ -1,6 +1,6 @@
 # test-established-expectations
 
-This package exports a couple test functions to be used with the chai testing library. It takes a result and an expectation key and compares the result to previously-stored results. Each test run (unless instructed otherwise) will save the new outputs. Thus, it is easy to store results automatically.
+Snapshot testing in chai using json files without automatic file population. Meaning, the first time you run the tests, they automatically populate the snapshots.
 
 Note that because JSON values are compared, some inputs may be parsed unexpectedly. For example, `Map` objects will simply get stringified as `{}`.
 
