@@ -134,7 +134,7 @@ export async function assertExpectation<ResultGeneric>({
     }
 
     if (assertionError) {
-        if (showFullError) {
+        if (showFullError || process.env.CI) {
             throw assertionError;
         } else {
             throw new Error(
