@@ -1,5 +1,8 @@
 {
     "topKey": {
         "subKey": "result"
+    },
+    "testFunctionWithInputs": {
+        "basic inputs": "return test input"
     }
 }

@@ -291,4 +291,20 @@ describe(assertExpectedOutput.name, () => {
             expectationFile: expectationFiles.fullExpectationFile,
         });
     });
+
+    it('should expect inputs if the functionToTest requires them', async () => {
+        function testFunctionWithInputs(a: string) {
+            return `return ${a}`;
+        }
+
+        await assertExpectedOutput(
+            testFunctionWithInputs,
+            {
+                key: {
+                    subKey: 'basic inputs',
+                },
+            },
+            'test input',
+        );
+    });
 });

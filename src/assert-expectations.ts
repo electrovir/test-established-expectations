@@ -1,9 +1,9 @@
-import {isRuntimeTypeOf, Overwrite} from '@augment-vir/common';
+import {AnyFunction, isRuntimeTypeOf, Overwrite, UnPromise} from '@augment-vir/common';
 import {appendJson, readJson} from '@augment-vir/node-js';
 import {assert} from 'chai';
 import {existsSync} from 'fs';
 import {join} from 'path';
-import {JsonObject, JsonValue, Promisable, SetOptional} from 'type-fest';
+import {JsonObject, JsonValue, SetOptional} from 'type-fest';
 import {ExpectationKeys, pickTopKeyFromExpectationKeys} from './expectation-key';
 import {CompareExpectationsOptions} from './expectation-options';
 
@@ -144,21 +144,26 @@ export async function assertExpectation<ResultGeneric>({
     }
 }
 
-export async function assertExpectedOutput<ResultGeneric>(
-    functionToExecute: () => Promisable<ResultGeneric>,
+export async function assertExpectedOutput<FunctionToTestGeneric extends AnyFunction>(
+    functionToExecute: FunctionToTestGeneric,
     options: Readonly<
         Omit<
             Overwrite<
-                CompareExpectationsOptions<ResultGeneric>,
-                {key: SetOptional<CompareExpectationsOptions<ResultGeneric>['key'], 'topKey'>}
+                CompareExpectationsOptions<unknown>,
+                {
+                    key: SetOptional<CompareExpectationsOptions<unknown>['key'], 'topKey'>;
+                }
             >,
             'result'
         >
     >,
+    ...inputs: Parameters<FunctionToTestGeneric>
 ): Promise<void> {
-    const result: Readonly<ResultGeneric> = await functionToExecute();
+    const result: Readonly<UnPromise<ReturnType<FunctionToTestGeneric>>> = await functionToExecute(
+        ...inputs,
+    );
 
-    const completeOptions: Readonly<CompareExpectationsOptions<ResultGeneric>> = {
+    const completeOptions: Readonly<CompareExpectationsOptions<typeof result>> = {
         ...options,
         key: {
             topKey: {function: functionToExecute},
