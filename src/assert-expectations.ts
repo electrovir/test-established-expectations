@@ -1,16 +1,25 @@
-import {AnyFunction, isRuntimeTypeOf, Overwrite, UnPromise} from '@augment-vir/common';
+import {
+    AnyFunction,
+    isRuntimeTypeOf,
+    JsonCompatibleValue,
+    Overwrite,
+    UnPromise,
+} from '@augment-vir/common';
 import {appendJson, readJson} from '@augment-vir/node-js';
 import {assert} from 'chai';
 import {existsSync} from 'fs';
 import {join} from 'path';
-import {JsonObject, JsonValue, SetOptional} from 'type-fest';
+import {JsonValue, SetOptional} from 'type-fest';
 import {ExpectationKeys, pickTopKeyFromExpectationKeys} from './expectation-key';
 import {CompareExpectationsOptions} from './expectation-options';
 
 const defaultExpectationFile = join('test-files', 'test-expectations.json');
 
+type SavedExpectations = Record<string, SavedExpectation>;
+type SavedExpectation = Record<string, JsonCompatibleValue>;
+
 function accessExpectationAtKey(
-    loadedExpectations: JsonObject,
+    loadedExpectations: SavedExpectations,
     keys: ExpectationKeys,
 ): {
     value: JsonValue | undefined;
@@ -46,13 +55,16 @@ function accessExpectationAtKey(
 }
 
 function createNewExpectation(
-    currentExpectationsFile: Readonly<JsonObject>,
+    currentExpectationsFileContents: Readonly<SavedExpectations>,
     newResult: any,
     keys: Readonly<ExpectationKeys>,
-): JsonObject {
+): SavedExpectation {
     const topKey = pickTopKeyFromExpectationKeys(keys);
-    const topKeyExpectationsObject = isRuntimeTypeOf(currentExpectationsFile[topKey], 'object')
-        ? (currentExpectationsFile[topKey] as JsonObject)
+    const topKeyExpectationsObject = isRuntimeTypeOf(
+        currentExpectationsFileContents[topKey],
+        'object',
+    )
+        ? currentExpectationsFileContents[topKey]
         : {};
 
     const newExpectation = {
@@ -62,7 +74,7 @@ function createNewExpectation(
         },
     };
 
-    return newExpectation as JsonObject;
+    return newExpectation;
 }
 
 export async function assertExpectation<ResultGeneric>({
@@ -82,11 +94,7 @@ export async function assertExpectation<ResultGeneric>({
     }
 
     const loadedExpectations = await readJson(expectationsFilePath);
-    if (!isRuntimeTypeOf(loadedExpectations, 'object')) {
-        throw new Error(
-            `Expectations file "${expectationsFilePath}" did not contain an object. It should contain an object.`,
-        );
-    }
+    assertValidSavedExpectations(loadedExpectations, expectationsFilePath);
 
     const {value: expectedExpectation, extractedKeys} = accessExpectationAtKey(
         loadedExpectations,
@@ -142,6 +150,26 @@ export async function assertExpectation<ResultGeneric>({
             );
         }
     }
+}
+
+function assertValidSavedExpectations(
+    input: unknown,
+    expectationsFilePath: string,
+): asserts input is SavedExpectations {
+    if (!isRuntimeTypeOf(input, 'object')) {
+        throw new Error(
+            `Expectations file '${expectationsFilePath}' did not contain an object. It should contain an object.`,
+        );
+    }
+    Object.keys(input).forEach((topKey) => {
+        const topKeyValue = input[topKey];
+
+        if (!isRuntimeTypeOf(topKeyValue, 'object')) {
+            throw new Error(
+                `Expectation group at top key '${topKey}' in expectation file '${expectationsFilePath}' is not an object.`,
+            );
+        }
+    });
 }
 
 export async function assertExpectedOutput<FunctionToTestGeneric extends AnyFunction>(
