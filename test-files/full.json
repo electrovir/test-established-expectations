@@ -8,5 +8,11 @@
     },
     "testFunction": {
         "basic output": "this is the output"
+    },
+    "empty inputs function": {
+        "should do something": "hi"
+    },
+    "testNamedFunction": {
+        "should do something": "32-"
     }
 }

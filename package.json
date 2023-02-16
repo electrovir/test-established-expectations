@@ -1,6 +1,6 @@
 {
     "name": "test-established-expectations",
-    "version": "0.2.0",
+    "version": "0.3.0",
     "description": "Snapshot testing in chai using json files.",
     "keywords": [
         "test",
@@ -42,12 +42,12 @@
         "test:types": "tsc --noEmit"
     },
     "dependencies": {
+        "@augment-vir/chai": "^12.9.1",
         "@augment-vir/common": "^12.9.1",
         "@augment-vir/node-js": "^12.9.1",
         "chai": "^4.3.7"
     },
     "devDependencies": {
-        "@augment-vir/chai": "^12.9.1",
         "@electrovir/nyc": "^15.1.0-fix0",
         "@istanbuljs/nyc-config-typescript": "^1.0.2",
         "@types/chai": "^4.3.4",

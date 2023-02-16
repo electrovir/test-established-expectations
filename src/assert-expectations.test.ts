@@ -296,4 +296,18 @@ describe(assertExpectedOutput.name, () => {
             'test input',
         );
     });
+
+    it('stores errors as the result', async () => {
+        await assertExpectedOutput(
+            () => {
+                throw new Error('error thrown here');
+            },
+            {
+                key: {
+                    topKey: 'assertExpectedOutput',
+                    subKey: 'catches error',
+                },
+            },
+        );
+    });
 });

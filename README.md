@@ -4,6 +4,8 @@ Snapshot testing in chai using json files without automatic file population. Mea
 
 Note that because JSON values are compared, some inputs may be parsed unexpectedly. For example, `Map` objects will simply get stringified as `{}`.
 
+Currently requires Mocha.
+
 ## Usage
 
 ### Installation
@@ -65,6 +67,59 @@ describe(myFunctionToTest.name, () => {
             result,
         });
     });
+});
+```
+
+### `expectationCases`
+
+Use `expectationCases` to quickly run multiple sets of expectation tests for a single function:
+
+<!-- example-link: src/readme-examples/expectation-cases.example.ts -->
+
+```TypeScript
+import {expectationCases} from 'test-established-expectations';
+
+function myFunctionToTest(input1: string, input2: number) {
+    return `${input1}-${input2}`;
+}
+
+describe(myFunctionToTest.name, () => {
+    expectationCases(myFunctionToTest, [
+        {
+            it: 'should combine inputs',
+            inputs: [
+                'first input',
+                2,
+            ],
+        },
+        {
+            it: 'should combine different inputs',
+            inputs: [
+                'one',
+                22,
+            ],
+        },
+    ]);
+
+    // optionally pass an options parameter as the second parameter
+    expectationCases(
+        myFunctionToTest,
+        {
+            // if the given function to test is anonymous, this testKey must be provided
+            testKey: 'topKey',
+            cwd: 'my/path',
+            expectationFile: 'my-expectation-file.json',
+        },
+        [
+            {
+                it: 'should combine different inputs with options',
+                inputs: [
+                    'more',
+                    -1,
+                ],
+            },
+        ],
+    );
 });
 ```
 

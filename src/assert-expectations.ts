@@ -1,9 +1,10 @@
 import {
     AnyFunction,
+    ensureError,
+    extractErrorMessage,
     isRuntimeTypeOf,
     JsonCompatibleValue,
     Overwrite,
-    UnPromise,
 } from '@augment-vir/common';
 import {appendJson, readJson} from '@augment-vir/node-js';
 import {assert} from 'chai';
@@ -172,24 +173,30 @@ function assertValidSavedExpectations(
     });
 }
 
+export type AssertExpectedOutputOptions = Readonly<
+    Omit<
+        Overwrite<
+            CompareExpectationsOptions<unknown>,
+            {
+                key: SetOptional<CompareExpectationsOptions<unknown>['key'], 'topKey'>;
+            }
+        >,
+        'result'
+    >
+>;
+
 export async function assertExpectedOutput<FunctionToTestGeneric extends AnyFunction>(
     functionToExecute: FunctionToTestGeneric,
-    options: Readonly<
-        Omit<
-            Overwrite<
-                CompareExpectationsOptions<unknown>,
-                {
-                    key: SetOptional<CompareExpectationsOptions<unknown>['key'], 'topKey'>;
-                }
-            >,
-            'result'
-        >
-    >,
+    options: AssertExpectedOutputOptions,
     ...inputs: Parameters<FunctionToTestGeneric>
 ): Promise<void> {
-    const result: Readonly<UnPromise<ReturnType<FunctionToTestGeneric>>> = await functionToExecute(
-        ...inputs,
-    );
+    let result: unknown;
+    try {
+        result = await functionToExecute(...inputs);
+    } catch (maybeError) {
+        const error = ensureError(maybeError);
+        result = `${error.name}: ${extractErrorMessage(error)}`;
+    }
 
     const completeOptions: Readonly<CompareExpectationsOptions<typeof result>> = {
         ...options,

@@ -4,5 +4,18 @@
     },
     "testFunctionWithInputs": {
         "basic inputs": "return test input"
+    },
+    "testNamedFunction": {
+        "creates some basic output": "42-hello there",
+        "creates more advanced output": "1.23456-string with interpolation"
+    },
+    "functionToTest": {
+        "creates some basic output": "just one string"
+    },
+    "assertExpectedOutput": {
+        "catches error": "Error: error thrown here"
+    },
+    "single input": {
+        "creates some basic output": "just one string"
     }
 }
