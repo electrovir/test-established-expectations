@@ -93,7 +93,7 @@ export async function assertExpectation<ResultGeneric>({
         );
     }
 
-    const loadedExpectations = await readJson(expectationsFilePath);
+    const loadedExpectations = (await readJson(expectationsFilePath)) ?? {};
     assertValidSavedExpectations(loadedExpectations, expectationsFilePath);
 
     const {value: expectedExpectation, extractedKeys} = accessExpectationAtKey(

@@ -70,11 +70,7 @@ describe(assertExpectation.name, () => {
         await writeFile(expectationFiles.emptyExpectationFile, '');
     });
 
-    it('should overwrite topKey child when it is not an object', async () => {
-        const beforeTestFileContents = await readFile(
-            expectationFiles.nonObjectChildExpectationFile,
-        );
-
+    it('fails if saved expectation group is not an object', async () => {
         await assert.isRejected(
             assertExpectation({
                 key: {
@@ -84,15 +80,8 @@ describe(assertExpectation.name, () => {
                 result: 'result',
                 expectationFile: expectationFiles.nonObjectChildExpectationFile,
             }),
-            'No expectation exists under keys',
+            /^Expectation group at top key .+ is not an object\.?$/,
         );
-        const afterTestJson = await readJson(expectationFiles.nonObjectChildExpectationFile);
-        assert.deepStrictEqual(afterTestJson, {
-            topKey: {
-                subKey: 'result',
-            },
-        });
-        await writeFile(expectationFiles.nonObjectChildExpectationFile, beforeTestFileContents);
     });
 
     it('should not modify other subKeys when they exist already', async () => {
