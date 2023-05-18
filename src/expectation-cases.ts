@@ -1,6 +1,6 @@
 import {FunctionTestCase} from '@augment-vir/chai';
 import {AnyFunction, filterObject, isRuntimeTypeOf} from '@augment-vir/common';
-import {assertExpectedOutput, AssertExpectedOutputOptions} from './assert-expectations';
+import {AssertExpectedOutputOptions, assertExpectedOutput} from './assert-expectations';
 
 export const runExpectationCases = expectationCases;
 

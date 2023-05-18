@@ -17,5 +17,10 @@
     },
     "single input": {
         "creates some basic output": "just one string"
+    },
+    "itSnapshots": {
+        "works with a single input": 52,
+        "works with multiple inputs": "a,42",
+        "works with no inputs": "worked"
     }
 }
