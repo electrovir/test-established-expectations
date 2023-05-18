@@ -1,16 +1,13 @@
-import {itCases, typedAssertNotNullish} from '@augment-vir/chai';
+import {assertThrows, itCases, typedAssertNotNullish} from '@augment-vir/chai';
 import {isRuntimeTypeOf, wrapNarrowTypeWithTypeCheck} from '@augment-vir/common';
 import {randomString, readJson} from '@augment-vir/node-js';
-import chai, {assert} from 'chai';
-import chaiAsPromised from 'chai-as-promised';
+import {assert} from 'chai';
 import {existsSync} from 'fs';
 import {readFile, unlink, writeFile} from 'fs/promises';
 import {describe} from 'mocha';
 import {assertExpectation, assertExpectedOutput} from './assert-expectations';
 import {CompareExpectationsOptions} from './expectation-options';
 import {expectationFiles} from './test-files.test-helper';
-
-chai.use(chaiAsPromised);
 
 async function testThatOutputGotWritten({
     filePath,
@@ -28,7 +25,7 @@ async function testThatOutputGotWritten({
         expectationFile: filePath,
     };
     if (shouldFail) {
-        await assert.isRejected(assertExpectation(options));
+        await assertThrows(assertExpectation(options));
     } else {
         await assertExpectation(options);
     }
@@ -71,7 +68,7 @@ describe(assertExpectation.name, () => {
     });
 
     it('fails if saved expectation group is not an object', async () => {
-        await assert.isRejected(
+        await assertThrows(
             assertExpectation({
                 key: {
                     topKey: 'topKey',
@@ -80,7 +77,9 @@ describe(assertExpectation.name, () => {
                 result: 'result',
                 expectationFile: expectationFiles.nonObjectChildExpectationFile,
             }),
-            /^Expectation group at top key .+ is not an object\.?$/,
+            {
+                matchMessage: /^Expectation group at top key .+ is not an object\.?$/,
+            },
         );
     });
 
@@ -103,7 +102,9 @@ describe(assertExpectation.name, () => {
             options.key.subKey,
         ]);
 
-        await assert.isRejected(assertExpectation(options), 'No expectation exists under keys');
+        await assertThrows(assertExpectation(options), {
+            matchMessage: 'No expectation exists under keys',
+        });
 
         const afterTestJson = await readJson(expectationFiles.fullExpectationFile);
 

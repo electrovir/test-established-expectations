@@ -5,7 +5,8 @@ import {
     RequireNonVoid,
     TypedFunction,
 } from '@augment-vir/common';
-import {assertExpectedOutput, CompareExpectationsOptions} from 'test-established-expectations';
+import {assertExpectedOutput} from './assert-expectations';
+import {CompareExpectationsOptions} from './expectation-options';
 
 type SnapshotTestBaseCase = {
     it: string;
@@ -27,26 +28,70 @@ type SnapshotTestCase<FunctionToTestGeneric extends AnyFunction> =
         ? SnapshotTestCaseSingleInput<FunctionToTestGeneric>
         : SnapshotTestCaseMultiInput<FunctionToTestGeneric>;
 
-type DoesNotAcceptEmptyString = 'this function does not accept empty strings';
-
-export function itSnapshots<FunctionToTestGeneric extends AnyFunction, DescribeKey extends string>(
-    functionToTest: FunctionToTestGeneric extends TypedFunction<any, infer ReturnValue>
+export function itSnapshots<FunctionToTestGeneric extends AnyFunction>(
+    functionToTestInput: FunctionToTestGeneric extends TypedFunction<any, infer ReturnValue>
         ? RequireNonVoid<ReturnValue, FunctionToTestGeneric>
         : never,
-    describeKey: '' extends DescribeKey
-        ? DoesNotAcceptEmptyString
-        : DoesNotAcceptEmptyString extends DescribeKey
-        ? never
-        : DescribeKey,
+    describeKey: string,
     snapshotCases: void extends ReturnType<FunctionToTestGeneric>
         ? 'functionToTest must return something so its output can be tested.'
         : ReadonlyArray<SnapshotTestCase<FunctionToTestGeneric>>,
+    options?: Pick<
+        CompareExpectationsOptions<any>,
+        'cwd' | 'noOverwriteWhenDifferent' | 'showFullError' | 'expectationFile'
+    >,
+): void;
+export function itSnapshots<FunctionToTestGeneric extends AnyFunction>(
+    functionToTestInput: FunctionToTestGeneric extends TypedFunction<any, infer ReturnValue>
+        ? RequireNonVoid<ReturnValue, FunctionToTestGeneric>
+        : never,
+    snapshotCases: void extends ReturnType<FunctionToTestGeneric>
+        ? 'functionToTest must return something so its output can be tested.'
+        : ReadonlyArray<SnapshotTestCase<FunctionToTestGeneric>>,
+    options?: Pick<
+        CompareExpectationsOptions<any>,
+        'cwd' | 'noOverwriteWhenDifferent' | 'showFullError' | 'expectationFile'
+    >,
+): void;
+export function itSnapshots<FunctionToTestGeneric extends AnyFunction>(
+    functionToTestInput: FunctionToTestGeneric extends TypedFunction<any, infer ReturnValue>
+        ? RequireNonVoid<ReturnValue, FunctionToTestGeneric>
+        : never,
+    describeKeyOrSnapshotCases:
+        | string
+        | (void extends ReturnType<FunctionToTestGeneric>
+              ? 'functionToTest must return something so its output can be tested.'
+              : ReadonlyArray<SnapshotTestCase<FunctionToTestGeneric>>),
+    snapshotCasesOrOptions:
+        | (void extends ReturnType<FunctionToTestGeneric>
+              ? 'functionToTest must return something so its output can be tested.'
+              : ReadonlyArray<SnapshotTestCase<FunctionToTestGeneric>>)
+        | Pick<
+              CompareExpectationsOptions<any>,
+              'cwd' | 'noOverwriteWhenDifferent' | 'showFullError' | 'expectationFile'
+          > = {},
     options: Pick<
         CompareExpectationsOptions<any>,
         'cwd' | 'noOverwriteWhenDifferent' | 'showFullError' | 'expectationFile'
     > = {},
-) {
-    assertRuntimeTypeOf(functionToTest, 'function', 'functionToTest input');
+): void {
+    assertRuntimeTypeOf(functionToTestInput, 'function', 'functionToTest input');
+    const functionToTest = functionToTestInput as AnyFunction;
+    const snapshotCases =
+        typeof describeKeyOrSnapshotCases === 'string'
+            ? snapshotCasesOrOptions
+            : describeKeyOrSnapshotCases;
+    const describeKey =
+        typeof describeKeyOrSnapshotCases === 'string'
+            ? describeKeyOrSnapshotCases
+            : functionToTest.name;
+
+    if (!describeKey) {
+        throw new Error(
+            `Received empty describe key. You either passed an empty describeKey string or your function is anonymous (has no name). Either explicitly provide a describeKey (as the second input to this function) or used a named function as the first input (rather than an anonymous one).`,
+        );
+    }
+
     assertRuntimeTypeOf(snapshotCases, 'array', 'snapshotCases input');
 
     snapshotCases.reduce((previousPromises, snapshotCase) => {
