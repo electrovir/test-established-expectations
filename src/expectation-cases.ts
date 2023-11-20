@@ -1,5 +1,6 @@
 import {FunctionTestCase} from '@augment-vir/chai';
-import {AnyFunction, filterObject, isRuntimeTypeOf} from '@augment-vir/common';
+import {AnyFunction, filterObject} from '@augment-vir/common';
+import {isRunTimeType} from 'run-time-assertions';
 import {AssertExpectedOutputOptions, assertExpectedOutput} from './assert-expectations';
 
 export const runExpectationCases = expectationCases;
@@ -29,11 +30,11 @@ export function expectationCases<FunctionToTestGeneric extends AnyFunction>(
         | ReadonlyArray<ExpectationTestCast<FunctionToTestGeneric>>,
     maybeTestCases?: ReadonlyArray<ExpectationTestCast<FunctionToTestGeneric>>,
 ): void {
-    const options: ExpectationCasesOptions = isRuntimeTypeOf(optionsOrTestCases, 'array')
+    const options: ExpectationCasesOptions = isRunTimeType(optionsOrTestCases, 'array')
         ? {}
         : optionsOrTestCases;
 
-    const testCases: ReadonlyArray<ExpectationTestCast<FunctionToTestGeneric>> = isRuntimeTypeOf(
+    const testCases: ReadonlyArray<ExpectationTestCast<FunctionToTestGeneric>> = isRunTimeType(
         optionsOrTestCases,
         'array',
     )
@@ -69,8 +70,8 @@ export function expectationCases<FunctionToTestGeneric extends AnyFunction>(
                 'inputs' in testCase
                     ? (testCase.inputs as Parameters<FunctionToTestGeneric>)
                     : 'input' in testCase
-                    ? ([testCase.input] as Parameters<FunctionToTestGeneric>)
-                    : ([] as unknown as Parameters<FunctionToTestGeneric>);
+                      ? ([testCase.input] as Parameters<FunctionToTestGeneric>)
+                      : ([] as unknown as Parameters<FunctionToTestGeneric>);
 
             await assertExpectedOutput(
                 functionToTest,

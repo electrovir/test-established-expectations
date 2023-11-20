@@ -1,10 +1,11 @@
-import {assertThrows, itCases, typedAssertNotNullish} from '@augment-vir/chai';
-import {isRuntimeTypeOf, wrapNarrowTypeWithTypeCheck} from '@augment-vir/common';
-import {randomString, readJson} from '@augment-vir/node-js';
+import {itCases} from '@augment-vir/chai';
+import {randomString, wrapNarrowTypeWithTypeCheck} from '@augment-vir/common';
+import {readJson} from '@augment-vir/node-js';
 import {assert} from 'chai';
 import {existsSync} from 'fs';
 import {readFile, unlink, writeFile} from 'fs/promises';
 import {describe} from 'mocha';
+import {assertDefined, assertThrows, isRunTimeType} from 'run-time-assertions';
 import {assertExpectation, assertExpectedOutput} from './assert-expectations';
 import {CompareExpectationsOptions} from './expectation-options';
 import {expectationFiles} from './test-files.test-helper';
@@ -108,9 +109,9 @@ describe(assertExpectation.name, () => {
 
         const afterTestJson = await readJson(expectationFiles.fullExpectationFile);
 
-        typedAssertNotNullish(afterTestJson);
+        assertDefined(afterTestJson);
 
-        if (!isRuntimeTypeOf(afterTestJson, 'object')) {
+        if (!isRunTimeType(afterTestJson, 'object')) {
             assert.isObject(afterTestJson);
             assert.isNotArray(afterTestJson);
             throw new Error('afterTestJson was not an object');

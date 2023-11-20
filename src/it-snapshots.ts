@@ -1,10 +1,10 @@
 import {
     AnyFunction,
-    assertRuntimeTypeOf,
     createDeferredPromiseWrapper,
     RequireNonVoid,
     TypedFunction,
 } from '@augment-vir/common';
+import {assertRunTimeType} from 'run-time-assertions';
 import {assertExpectedOutput} from './assert-expectations';
 import {CompareExpectationsOptions} from './expectation-options';
 
@@ -25,8 +25,8 @@ type SnapshotTestCase<FunctionToTestGeneric extends AnyFunction> =
     Parameters<FunctionToTestGeneric> extends []
         ? SnapshotTestBaseCase
         : Parameters<FunctionToTestGeneric> extends [any?]
-        ? SnapshotTestCaseSingleInput<FunctionToTestGeneric>
-        : SnapshotTestCaseMultiInput<FunctionToTestGeneric>;
+          ? SnapshotTestCaseSingleInput<FunctionToTestGeneric>
+          : SnapshotTestCaseMultiInput<FunctionToTestGeneric>;
 
 export function itSnapshots<FunctionToTestGeneric extends AnyFunction>(
     functionToTestInput: FunctionToTestGeneric extends TypedFunction<any, infer ReturnValue>
@@ -75,7 +75,7 @@ export function itSnapshots<FunctionToTestGeneric extends AnyFunction>(
         'cwd' | 'noOverwriteWhenDifferent' | 'showFullError' | 'expectationFile'
     > = {},
 ): void {
-    assertRuntimeTypeOf(functionToTestInput, 'function', 'functionToTest input');
+    assertRunTimeType(functionToTestInput, 'function', 'functionToTest input');
     const functionToTest = functionToTestInput as AnyFunction;
     const snapshotCases =
         typeof describeKeyOrSnapshotCases === 'string'
@@ -92,52 +92,55 @@ export function itSnapshots<FunctionToTestGeneric extends AnyFunction>(
         );
     }
 
-    assertRuntimeTypeOf(snapshotCases, 'array', 'snapshotCases input');
+    assertRunTimeType(snapshotCases, 'array', 'snapshotCases input');
 
-    snapshotCases.reduce((previousPromises, snapshotCase) => {
-        const newDeferredPromise = createDeferredPromiseWrapper<void>();
-        const currentPromises = [
-            ...previousPromises,
-            newDeferredPromise.promise,
-        ];
-        // add an empty error handler to prevent extraneous errors
-        // cannot test for it cases that fail
-        // istanbul ignore next
-        newDeferredPromise.promise.catch(() => null);
-        it(snapshotCase.it, async () => {
-            try {
-                await Promise.all(previousPromises);
-            } catch (error) {
-                // ignore this error so that all tests try to run
-            }
-            try {
-                const inputs: Parameters<FunctionToTestGeneric> =
-                    'input' in snapshotCase
-                        ? ([snapshotCase.input] as Parameters<FunctionToTestGeneric>)
-                        : 'inputs' in snapshotCase
-                        ? snapshotCase.inputs
-                        : ([] as unknown as Parameters<FunctionToTestGeneric>);
-                await assertExpectedOutput(
-                    functionToTest,
-                    {
-                        key: {
-                            topKey: describeKey,
-                            subKey: snapshotCase.it,
+    snapshotCases.reduce(
+        (previousPromises, snapshotCase) => {
+            const newDeferredPromise = createDeferredPromiseWrapper<void>();
+            const currentPromises = [
+                ...previousPromises,
+                newDeferredPromise.promise,
+            ];
+            // add an empty error handler to prevent extraneous errors
+            // cannot test for it cases that fail
+            // istanbul ignore next
+            newDeferredPromise.promise.catch(() => null);
+            it(snapshotCase.it, async () => {
+                try {
+                    await Promise.all(previousPromises);
+                } catch (error) {
+                    // ignore this error so that all tests try to run
+                }
+                try {
+                    const inputs: Parameters<FunctionToTestGeneric> =
+                        'input' in snapshotCase
+                            ? ([snapshotCase.input] as Parameters<FunctionToTestGeneric>)
+                            : 'inputs' in snapshotCase
+                              ? snapshotCase.inputs
+                              : ([] as unknown as Parameters<FunctionToTestGeneric>);
+                    await assertExpectedOutput(
+                        functionToTest,
+                        {
+                            key: {
+                                topKey: describeKey,
+                                subKey: snapshotCase.it,
+                            },
+                            ...options,
                         },
-                        ...options,
-                    },
-                    ...inputs,
-                );
-                newDeferredPromise.resolve();
-            } catch (error) {
-                // cannot test for it cases that fail
-                // istanbul ignore next
-                newDeferredPromise.reject(error);
-                // istanbul ignore next
-                throw error;
-            }
-        });
+                        ...inputs,
+                    );
+                    newDeferredPromise.resolve();
+                } catch (error) {
+                    // cannot test for it cases that fail
+                    // istanbul ignore next
+                    newDeferredPromise.reject(error);
+                    // istanbul ignore next
+                    throw error;
+                }
+            });
 
-        return currentPromises;
-    }, [] as ReadonlyArray<Promise<void>>);
+            return currentPromises;
+        },
+        [] as ReadonlyArray<Promise<void>>,
+    );
 }

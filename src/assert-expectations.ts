@@ -2,7 +2,6 @@ import {
     AnyFunction,
     ensureError,
     extractErrorMessage,
-    isRuntimeTypeOf,
     JsonCompatibleValue,
     Overwrite,
 } from '@augment-vir/common';
@@ -10,6 +9,7 @@ import {appendJson, readJson} from '@augment-vir/node-js';
 import {assert} from 'chai';
 import {existsSync} from 'fs';
 import {join} from 'path';
+import {isRunTimeType} from 'run-time-assertions';
 import {JsonValue, SetOptional} from 'type-fest';
 import {ExpectationKeys, pickTopKeyFromExpectationKeys} from './expectation-key';
 import {CompareExpectationsOptions} from './expectation-options';
@@ -43,7 +43,7 @@ function accessExpectationAtKey(
         subKey: keys.subKey,
     };
 
-    if (!isRuntimeTypeOf(outerValue, 'object')) {
+    if (!isRunTimeType(outerValue, 'object')) {
         return {
             value: undefined,
             extractedKeys,
@@ -61,7 +61,7 @@ function createNewExpectation(
     keys: Readonly<ExpectationKeys>,
 ): SavedExpectation {
     const topKey = pickTopKeyFromExpectationKeys(keys);
-    const topKeyExpectationsObject = isRuntimeTypeOf(
+    const topKeyExpectationsObject = isRunTimeType(
         currentExpectationsFileContents[topKey],
         'object',
     )
@@ -157,7 +157,7 @@ function assertValidSavedExpectations(
     input: unknown,
     expectationsFilePath: string,
 ): asserts input is SavedExpectations {
-    if (!isRuntimeTypeOf(input, 'object')) {
+    if (!isRunTimeType(input, 'object')) {
         throw new Error(
             `Expectations file '${expectationsFilePath}' did not contain an object. It should contain an object.`,
         );
@@ -165,7 +165,7 @@ function assertValidSavedExpectations(
     Object.keys(input).forEach((topKey) => {
         const topKeyValue = input[topKey];
 
-        if (!isRuntimeTypeOf(topKeyValue, 'object')) {
+        if (!isRunTimeType(topKeyValue, 'object')) {
             throw new Error(
                 `Expectation group at top key '${topKey}' in expectation file '${expectationsFilePath}' is not an object.`,
             );

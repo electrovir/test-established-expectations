@@ -1,4 +1,4 @@
-import {assertThrows} from '@augment-vir/chai';
+import {assertThrows} from 'run-time-assertions';
 import {itSnapshots} from './it-snapshots';
 
 describe(itSnapshots.name, () => {

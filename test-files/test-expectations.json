@@ -1,26 +1,26 @@
 {
-    "topKey": {
-        "subKey": "result"
-    },
-    "testFunctionWithInputs": {
-        "basic inputs": "return test input"
-    },
-    "testNamedFunction": {
-        "creates some basic output": "42-hello there",
-        "creates more advanced output": "1.23456-string with interpolation"
-    },
-    "functionToTest": {
-        "creates some basic output": "just one string"
-    },
     "assertExpectedOutput": {
         "catches error": "Error: error thrown here"
     },
-    "single input": {
+    "functionToTest": {
         "creates some basic output": "just one string"
     },
     "itSnapshots": {
         "works with a single input": 52,
         "works with multiple inputs": "a,42",
         "works with no inputs": "worked"
+    },
+    "single input": {
+        "creates some basic output": "just one string"
+    },
+    "testFunctionWithInputs": {
+        "basic inputs": "return test input"
+    },
+    "testNamedFunction": {
+        "creates more advanced output": "1.23456-string with interpolation",
+        "creates some basic output": "42-hello there"
+    },
+    "topKey": {
+        "subKey": "result"
     }
 }

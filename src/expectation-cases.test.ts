@@ -1,5 +1,5 @@
-import {typedAssertInstanceOf} from '@augment-vir/chai';
 import {assert} from 'chai';
+import {assertInstanceOf} from 'run-time-assertions';
 import {expectationCases} from './expectation-cases';
 import {expectationFiles} from './test-files.test-helper';
 
@@ -40,7 +40,7 @@ describe(expectationCases.name, () => {
     } catch (error) {
         caughtError = error;
     }
-    typedAssertInstanceOf(caughtError, Error);
+    assertInstanceOf(caughtError, Error);
     assert.include(caughtError.message, 'Please pass a testKey to expectationCases');
 
     try {
@@ -48,7 +48,7 @@ describe(expectationCases.name, () => {
     } catch (error) {
         caughtError = error;
     }
-    typedAssertInstanceOf(caughtError, Error);
+    assertInstanceOf(caughtError, Error);
     assert.include(caughtError.message, 'No test cases');
 
     expectationCases(

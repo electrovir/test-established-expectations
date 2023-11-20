@@ -1,5 +1,5 @@
-import {assertTypeOf} from '@augment-vir/chai';
 import {describe, it} from 'mocha';
+import {assertTypeOf} from 'run-time-assertions';
 import {CompareExpectationsOptions} from './expectation-options';
 
 describe('CompareExpectationsOptions', () => {
