@@ -1,6 +1,6 @@
 {
     "name": "test-established-expectations",
-    "version": "0.5.1",
+    "version": "1.0.0",
     "description": "Snapshot testing in chai using json files.",
     "keywords": [
         "test",
